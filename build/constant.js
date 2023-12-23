@@ -58,3 +58,4 @@ export const INITIAL_BLOCK_SETTTING = Object.freeze({
         point: normalPointSetter(2)
     }
 });
+export const BUNDLE_TYPE_ARRAY = ['straight', 'zigzag', 'fuck', 'revShapeL', 'revZigzag', 'shapeL', 'square'];

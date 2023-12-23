@@ -11,13 +11,39 @@ export class BlockElement {
     }
     get x() { return this._x; }
     get y() { return this._y; }
+    set x(x) { this._x = x; }
+    ;
+    set y(y) { this._y = y; }
+    ;
+    move(dir) {
+        switch (dir) {
+            case 'up':
+                --this._y;
+                break;
+            case 'down':
+                ++this._y;
+                break;
+            case 'right':
+                ++this._x;
+                break;
+            case 'left':
+                --this._x;
+                break;
+            default:
+                throw new Error('unvalid direction');
+        }
+    }
     rotate(pointX, pointY, reverse = false) {
         const { x, y } = this.rotateResultData(pointX, pointY, reverse);
         this._x = x;
         this._y = y;
     }
-    renderFill(idPrefix) {
+    renderFill(idPrefix, c) {
         var _a;
-        (_a = document.getElementById(`${idPrefix}_${this._y * 10 + this._x}`)) === null || _a === void 0 ? void 0 : _a.classList.add('fill-moving-block');
+        (_a = document.getElementById(`${idPrefix}_${this._y * 10 + this._x}`)) === null || _a === void 0 ? void 0 : _a.classList.add(c);
+    }
+    erase(idPrefix, c) {
+        var _a;
+        (_a = document.getElementById(`${idPrefix}_${this._y * 10 + this._x}`)) === null || _a === void 0 ? void 0 : _a.classList.remove(c);
     }
 }

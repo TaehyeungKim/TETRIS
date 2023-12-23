@@ -16,7 +16,7 @@ type RotatePointCoordinate = {
 type BlockBundleType = 'straight'|'shapeL'|'revShapeL'|'square'|'fuck'|'zigzag'|'revZigzag';
 type PointSetter = (arg: BlockElementInterface[]) => RotatePointCoordinate
 
-type BlockBundleSetting = {
+export type BlockBundleSetting = {
     type: BlockBundleType,
     coord: BlockElementCoordinateInfo[],
     point: PointSetter
@@ -83,3 +83,5 @@ export const INITIAL_BLOCK_SETTTING: Readonly<Record<BlockBundleType,BlockBundle
         point: normalPointSetter(2)
     }
 })
+
+export const BUNDLE_TYPE_ARRAY: Array<BlockBundleType> = ['straight','zigzag','fuck','revShapeL','revZigzag','shapeL','square']
