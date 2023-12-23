@@ -15,6 +15,9 @@ export interface BlockElementInterface {
     erase(idPrefix: string, c: string): void;
     move(dir: BlockMoveDirection): void|never;
 }
+export type BlockElementConstructor = {
+    new (x: number, y: number): BlockElementInterface
+}
 
 export class BlockElement implements BlockElementInterface{
     constructor(private _x: number, private _y: number) {}

@@ -4,6 +4,12 @@ export class BlockBundle {
         this.setting = setting;
         this._blockBundleArray = setting.coord.map(coord => new blockElement(coord.x, coord.y));
     }
+    get blockBundleArray() {
+        return this._blockBundleArray;
+    }
+    get blockBundleSetting() {
+        return this.setting;
+    }
     render(idPrefix, c) {
         this._blockBundleArray.forEach(block => block.renderFill(idPrefix, c));
     }

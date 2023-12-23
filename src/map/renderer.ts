@@ -50,4 +50,18 @@ export class MapRenderer extends Renderer{
         this.render(root, mapOverlapGrid, MapRenderer.mapOverlapGridTemplate);
 
     }
+
+    protected modifyGridByClass(targetId: string, c: string, action: 'add'|'remove') {
+        switch(action) {
+            case 'add':
+                document.getElementById(targetId)?.classList.add(c);
+                break;
+            case 'remove':
+                document.getElementById(targetId)?.classList.remove(c);
+                break;
+            default:
+                throw new Error('unvaild action')
+        }
+        
+    }
 }

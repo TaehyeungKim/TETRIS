@@ -32,6 +32,19 @@ export class MapRenderer extends Renderer {
         this.render(root, mapGrid, MapRenderer.mapGridTemplate);
         this.render(root, mapOverlapGrid, MapRenderer.mapOverlapGridTemplate);
     }
+    modifyGridByClass(targetId, c, action) {
+        var _a, _b;
+        switch (action) {
+            case 'add':
+                (_a = document.getElementById(targetId)) === null || _a === void 0 ? void 0 : _a.classList.add(c);
+                break;
+            case 'remove':
+                (_b = document.getElementById(targetId)) === null || _b === void 0 ? void 0 : _b.classList.remove(c);
+                break;
+            default:
+                throw new Error('unvaild action');
+        }
+    }
 }
 MapRenderer.mapGridTemplate = `
     display: grid; grid-template-rows: repeat(${MAP_HEIGHT}, 1fr);

@@ -1,8 +1,10 @@
-import { BlockElementInterface } from "./blockElement.js";
 import { BlockBundleSetting, BlockElementCoordinateInfo, BUNDLE_TYPE_ARRAY, INITIAL_BLOCK_SETTTING} from "../constant.js";
-import { BlockMoveDirection } from "./blockElement.js";
+import { BlockMoveDirection, BlockElementConstructor, BlockElementInterface } from "./blockElement.js";
 
-interface BlockBundleInterface {
+
+export interface BlockBundleInterface {
+    get blockBundleArray(): BlockElementInterface[]
+    get blockBundleSetting(): BlockBundleSetting
     render(idPrefix: string, c: string): void;
     erase(idPrefix: string, c: string): void;
     rotateResultData(): BlockElementCoordinateInfo[];
@@ -11,8 +13,8 @@ interface BlockBundleInterface {
     refreshBundle(): void;    
 }
 
-type BlockElementConstructor = {
-    new (x: number, y: number): BlockElementInterface
+export type BlockBundleConstructor = {
+    new(setting: BlockBundleSetting, blockElement: BlockElementConstructor):BlockBundleInterface
 }
 
 export class BlockBundle implements BlockBundleInterface{
@@ -23,6 +25,14 @@ export class BlockBundle implements BlockBundleInterface{
         this._blockBundleArray = setting.coord.map(coord=>new blockElement(coord.x, coord.y))
     }
 
+    get blockBundleArray() {
+        return this._blockBundleArray
+    }
+
+    get blockBundleSetting() {
+        return this.setting
+    }
+
     render(idPrefix: string, c: string) {
         this._blockBundleArray.forEach(block=>block.renderFill(idPrefix, c))
     }
@@ -30,6 +40,8 @@ export class BlockBundle implements BlockBundleInterface{
     erase(idPrefix: string, c: string) {
         this._blockBundleArray.forEach(block=>block.erase(idPrefix, c))
     }
+
+    
 
     rotateResultData() {
         const {pointX, pointY} = this.setting.point(this._blockBundleArray);
