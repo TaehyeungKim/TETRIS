@@ -17,7 +17,11 @@ class Renderer {
     }
 }
 
-export class MapRenderer extends Renderer{
+export interface MapRendererInterface {
+    renderMap(root: HTMLElement): void;
+}
+
+export class MapRenderer extends Renderer implements MapRendererInterface{
 
        
     private static mapGridTemplate: string = `

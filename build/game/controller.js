@@ -1,5 +1,5 @@
-import { BlockElement } from "./block/blockElement.js";
-import { INITIAL_BLOCK_SETTTING } from "./constant.js";
+import { BlockElement } from "../block/blockElement.js";
+import { INITIAL_BLOCK_SETTTING } from "../constant.js";
 export class Controller {
     constructor(blockBundle, map) {
         this._map = new map(10, 20);
@@ -8,11 +8,39 @@ export class Controller {
     validateRotateCondition(x, y) {
         return x >= 0 && x < this._map.width && y >= 0 && y < this._map.height && this._map.map[y][x] === 0;
     }
+    validateMoveCondition(dir) {
+        const coords = this._blockBundle.blockBundleArray.map(block => {
+            return { x: block.x, y: block.y };
+        });
+        let valid = true;
+        switch (dir) {
+            case "left":
+                coords.forEach(coord => {
+                    if (coord.x - 1 < 0 || this._map.map[coord.y][coord.x - 1] === 1)
+                        valid = false;
+                });
+                break;
+            case "right":
+                coords.forEach(coord => {
+                    if (coord.x + 1 > this._map.width - 1 || this._map.map[coord.y][coord.x + 1] === 1)
+                        valid = false;
+                });
+                break;
+            case "down":
+                break;
+            default:
+                throw new Error("do not check other directions");
+        }
+        return valid;
+    }
     renderMap(root) {
         this._map.renderMap(root);
     }
     renderMovingBlock(idPrefix, c) {
         this._blockBundle.render(idPrefix, c);
+    }
+    eraseTrackOfMovingBlock(idPrefix, c) {
+        this._blockBundle.erase(idPrefix, c);
     }
     blockRotate() {
         const { pointX, pointY } = this._blockBundle.blockBundleSetting.point(this._blockBundle.blockBundleArray);
@@ -25,6 +53,10 @@ export class Controller {
         if (!valid)
             return;
         this._blockBundle.blockBundleArray.forEach((block => block.rotate(pointX, pointY)));
+    }
+    blockMove(dir) {
+        if (this.validateMoveCondition(dir))
+            this._blockBundle.move(dir);
     }
     blockCrashDown() {
         let crash = false;

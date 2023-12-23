@@ -18,16 +18,16 @@ export class BlockElement {
     move(dir) {
         switch (dir) {
             case 'up':
-                --this._y;
+                this._y--;
                 break;
             case 'down':
-                ++this._y;
+                this._y++;
                 break;
             case 'right':
-                ++this._x;
+                this._x++;
                 break;
             case 'left':
-                --this._x;
+                this._x--;
                 break;
             default:
                 throw new Error('unvalid direction');

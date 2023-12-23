@@ -17,3 +17,7 @@ body {
 .fill-moving-block {
     background-color: aqua;
 }
+
+.fill-fixed-block {
+    background-color: coral;
+}

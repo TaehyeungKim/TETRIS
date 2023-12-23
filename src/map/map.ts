@@ -1,11 +1,11 @@
 
-import { MapRenderer } from "./renderer.js";
+import { MapRenderer, MapRendererInterface } from "./renderer.js";
 
-export interface MapInterface {
+export interface MapInterface extends MapRendererInterface {
     get map(): number[][];
     get width(): number;
     get height(): number;
-    
+
     detectFullLine(): number[][];
     fixBlock(x: number, y: number): void;
     eraseBlock(x:number, y:number): void;
@@ -46,32 +46,55 @@ export class Map extends MapRenderer implements MapInterface {
 
     fixBlock(x: number, y: number) {
         this._map[y][x] = 1;
-        this.modifyGridByClass(`block-grid_${y*10 + x}`, 'fill', 'add')
+        this.modifyGridByClass(`block-grid_${y*10 + x}`, 'fill-fixed-block', 'add')
     }
 
     eraseBlock(x:number, y:number) {
         this._map[y][x] = 0;
-        this.modifyGridByClass(`block-grid_${y*10 + x}`, 'fill','remove')
+        this.modifyGridByClass(`block-grid_${y*10 + x}`, 'fill-fixed-block','remove')
     }
 
     destroyFullLine() {
-        const fullLines = this.detectFullLine().reverse();
+        const fullLines = this.detectFullLine();
         if(fullLines.length === 0) return ;
 
-        let walk = 0;
-        this._map.reverse().forEach((row: number[], index:number)=>{
-            if(row === fullLines[walk]) {
-                row.forEach((_:number, i: number)=>this.eraseBlock(i, index))
-                walk++;
+        let walk = fullLines.length - 1;
+
+        for(let k = this._h - 1; k >= 0; k--) {
+            if(this._map[k] === fullLines[walk]) {
+                this._map[k].forEach((_: number, i: number)=>this.eraseBlock(i, k));
+                walk--
             }
-            else if(index < this._map.length - 1) row.forEach((v:number, i: number)=>{
-                if(v === 1) {
-                    this.fixBlock(i, index-walk);
-                    this.eraseBlock(i, index);
-                }
-            })
-            this._map.reverse();
-        })
+            else {
+                this._map[k].forEach((v: number, i: number)=>{
+                    if(v===1) {
+                        this.fixBlock(i, k+fullLines.length-1-walk);
+                        this.eraseBlock(i, k)
+                    }
+                })
+            }
+        }
+
+        // const fullLines = this.detectFullLine().reverse();
+        // if(fullLines.length === 0) return ;
+
+        // let walk = 0;
+
+
+        // this._map.reverse().forEach((row: number[], index:number)=>{
+        //     if(row === fullLines[walk]) {
+        //         row.forEach((_:number, i: number)=>this.eraseBlock(i, this._h-1 - index))
+        //         walk++;
+        //     }
+        //     else if(index < this._map.length - 1) row.forEach((v:number, i: number)=>{
+        //         if(v === 1) {
+        //             this.fixBlock(i, this._h - 1 - (index-walk));
+        //             this.eraseBlock(i, this._h - 1 - index);
+        //         }
+        //     })
+            
+        // })
+        // this._map.reverse();
     }
  
 }

@@ -1,3 +1,3 @@
-import { MapRenderer } from "./map/renderer.js";
-const map = new MapRenderer();
-// map.renderMap(document.getElementById('root') as HTMLElement);
+import { Game } from "./game/game.js";
+const game = new Game();
+game.play();
