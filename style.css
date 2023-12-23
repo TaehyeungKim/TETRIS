@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.game {
+    width: 300px;
+    aspect-ratio: 0.5;
+    position: relative;
+}
+
+.block-grid, .moving-block-grid {
+    box-sizing: border-box;
+    border: 1px solid gray;
+}
