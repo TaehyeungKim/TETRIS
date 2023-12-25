@@ -15,7 +15,7 @@ export class Game extends Controller {
                     this.updateMovingBlockRenderAction(() => this.blockRotate(), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 case 'ArrowDown':
-                    this.updateMovingBlockRenderAction(() => this.blockMoveDown(), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
+                    this.updateMovingBlockRenderAction(() => this.blockMoveDown(Game.movingBlockGridPrefix, Game.movingBlockFillClass), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 case 'ArrowLeft':
@@ -25,7 +25,7 @@ export class Game extends Controller {
                     this.updateMovingBlockRenderAction(() => this.blockMove('right'), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 case ' ':
-                    this.updateMovingBlockRenderAction(() => this.blockMoveDownToEnd(), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
+                    this.updateMovingBlockRenderAction(() => this.blockMoveDownToEnd(Game.movingBlockGridPrefix, Game.movingBlockFillClass), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 default:

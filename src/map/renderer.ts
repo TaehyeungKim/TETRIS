@@ -31,7 +31,7 @@ export class MapRenderer extends Renderer implements MapRendererInterface{
     `
 
     private static mapOverlapGridTemplate: string = MapRenderer.mapGridTemplate + `
-    z-index: 10;
+    z-index: -1;
     `
 
     private generateGrid(container: HTMLElement, childId: string) {

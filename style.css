@@ -21,3 +21,19 @@ body {
 .fill-fixed-block {
     background-color: coral;
 }
+
+@keyframes gridBlink {
+    0% {
+        background-color: aquamarine;
+    }
+    50% {
+        background-color:blueviolet;
+    }
+    100% {
+        background-color: aquamarine;
+    }
+}
+
+.fullLine-grid-blink {
+    animation: gridBlink 1s ease-in-out;
+}

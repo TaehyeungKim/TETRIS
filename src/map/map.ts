@@ -9,7 +9,8 @@ export interface MapInterface extends MapRendererInterface {
     detectFullLine(): number[][];
     fixBlock(x: number, y: number): void;
     eraseBlock(x:number, y:number): void;
-    destroyFullLine(): void;
+    destroyFullLine(fullLines: number[][]): void;
+    fullLineBlink(fullLines: number[][], blinkTime: number): Promise<boolean>
 }
 
 export type MapConstructor = {
@@ -19,6 +20,7 @@ export type MapConstructor = {
 export class Map extends MapRenderer implements MapInterface {
 
     private _map: Array<Array<number>>;
+    private static gridBlinkClass: string = 'fullLine-grid-blink'
 
     constructor(private _w: number, private _h: number) {
         super();
@@ -54,8 +56,37 @@ export class Map extends MapRenderer implements MapInterface {
         this.modifyGridByClass(`block-grid_${y*10 + x}`, 'fill-fixed-block','remove')
     }
 
-    destroyFullLine() {
-        const fullLines = this.detectFullLine();
+    async fullLineBlink(fullLines: number[][], blinkTime: number): Promise<boolean> {
+
+        let walk = fullLines.length - 1
+
+        for(let k = this._h - 1; k >=0; k--) {
+            if(this._map[k] === fullLines[walk]) {
+                for(let j = 0; j < this._w; j++) this.modifyGridByClass(`block-grid_${k*10 + j}`, Map.gridBlinkClass, 'add')
+                walk--
+            }
+            if(walk < 0) break;
+        }
+
+        return new Promise((resolve)=>{
+            setTimeout(()=>resolve(true), blinkTime)
+        }).then(()=>{
+
+            let walk = fullLines.length - 1
+
+            for(let k = this._h - 1; k >=0; k--) {
+                if(this._map[k] === fullLines[walk]) {
+                    for(let j = 0; j < this._w; j++) this.modifyGridByClass(`block-grid_${k*10 + j}`, Map.gridBlinkClass, 'remove')
+                    walk--
+                }
+                if(walk < 0) break;
+            }
+            return true
+        })
+    }
+
+    destroyFullLine(fullLines: number[][]) {
+    
         if(fullLines.length === 0) return ;
 
         let walk = fullLines.length - 1;

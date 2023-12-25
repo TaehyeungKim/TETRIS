@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { BlockElement } from "../block/blockElement.js";
 import { INITIAL_BLOCK_SETTTING } from "../constant.js";
 export class Controller {
@@ -67,7 +76,7 @@ export class Controller {
         if (this.validateMoveCondition(dir))
             this._blockBundle.move(dir);
     }
-    blockCrashDown() {
+    checkBlockCrashDown(idPrefix, c) {
         let crash = false;
         this._blockBundle.blockBundleArray.forEach(block => {
             if (block.y > this._map.height - 1 || (this._map.map[block.y][block.x]))
@@ -76,28 +85,29 @@ export class Controller {
         if (crash) {
             this._blockBundle.move('up');
             this._blockBundle.blockBundleArray.forEach(block => this._map.fixBlock(block.x, block.y));
-            this._blockBundle.refreshBundle();
+            this.checkIfFullLines().then(() => this.updateMovingBlockRenderAction(() => this._blockBundle.refreshBundle(), idPrefix, c));
         }
-        this.checkIfFullLines();
         this.checkIfMapFull();
         return crash;
     }
-    blockMoveDown() {
-        clearTimeout(this._blockMoveTimer);
+    blockMoveDown(idPrefix, c) {
+        if (this._blockBundle.isFrozen)
+            return false;
         this.blockMove('down');
-        return this.blockCrashDown();
+        clearTimeout(this._blockMoveTimer);
+        return this.checkBlockCrashDown(idPrefix, c);
     }
-    blockMoveDownToEnd() {
-        let crash = this.blockMoveDown();
+    blockMoveDownToEnd(idPrefix, c) {
+        let crash = this.blockMoveDown(idPrefix, c);
         while (!crash)
-            crash = this.blockMoveDown();
+            crash = this.blockMoveDown(idPrefix, c);
     }
     registerAutoBlockMove(idPrefix, c) {
         const timerPromise = () => new Promise((resolve) => {
             const validateMoveDown = this._map.detectFullLine().length > 0;
             this._blockMoveTimer = setTimeout(() => {
                 if (!validateMoveDown) {
-                    this.updateMovingBlockRenderAction(() => this.blockMoveDown(), idPrefix, c);
+                    this.updateMovingBlockRenderAction(() => this.blockMoveDown(idPrefix, c), idPrefix, c);
                 }
                 resolve(true);
                 clearTimeout(this._blockMoveTimer);
@@ -106,10 +116,19 @@ export class Controller {
         timerPromise();
     }
     checkIfFullLines() {
-        const fullLines = this._map.detectFullLine();
-        if (fullLines.length === 0)
-            return;
-        this._map.destroyFullLine();
+        return __awaiter(this, void 0, void 0, function* () {
+            const fullLines = this._map.detectFullLine();
+            if (fullLines.length === 0)
+                return;
+            this._blockBundle.controllMove(true);
+            return new Promise((resolve) => {
+                this._map.fullLineBlink(fullLines, 1000).then(() => {
+                    this._map.destroyFullLine(fullLines);
+                    this._blockBundle.controllMove(false);
+                    resolve(true);
+                });
+            });
+        });
     }
     checkIfMapFull() {
         if (this._map.map[0].reduce((a, b) => a + b) === 10)

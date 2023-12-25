@@ -52,5 +52,5 @@ MapRenderer.mapGridTemplate = `
     position: absolute; left: 0; top: 0; right: 0; bottom: 0;
     `;
 MapRenderer.mapOverlapGridTemplate = MapRenderer.mapGridTemplate + `
-    z-index: 10;
+    z-index: -1;
     `;

@@ -83,7 +83,7 @@ export class Controller {
         if(this.validateMoveCondition(dir)) this._blockBundle.move(dir);
     }
 
-    private blockCrashDown():boolean {
+    private checkBlockCrashDown(idPrefix: string, c: string):boolean {
         let crash = false;
         this._blockBundle.blockBundleArray.forEach(block=>{
             if(block.y > this._map.height - 1 || (this._map.map[block.y][block.x])) crash = true;
@@ -91,24 +91,27 @@ export class Controller {
         if(crash) {
             this._blockBundle.move('up');
             this._blockBundle.blockBundleArray.forEach(block=>this._map.fixBlock(block.x, block.y))
-            this._blockBundle.refreshBundle();
+            this.checkIfFullLines().then(()=>this.updateMovingBlockRenderAction(()=>this._blockBundle.refreshBundle(), idPrefix, c))
         }
 
-        this.checkIfFullLines();
+        
         this.checkIfMapFull();
 
         return crash;
     }
 
-    protected blockMoveDown(): boolean {
-        clearTimeout(this._blockMoveTimer);
+    protected blockMoveDown(idPrefix: string, c: string): boolean {
+
+        if(this._blockBundle.isFrozen) return false; 
         this.blockMove('down');
-        return this.blockCrashDown();
+        clearTimeout(this._blockMoveTimer);
+        
+        return this.checkBlockCrashDown(idPrefix, c);
     }
 
-    protected blockMoveDownToEnd() {
-        let crash: boolean = this.blockMoveDown();
-        while(!crash) crash = this.blockMoveDown();
+    protected blockMoveDownToEnd(idPrefix: string, c: string) {
+        let crash: boolean = this.blockMoveDown(idPrefix, c);
+        while(!crash) crash = this.blockMoveDown(idPrefix, c);
     }
 
     protected registerAutoBlockMove(idPrefix: string, c: string) {
@@ -116,7 +119,7 @@ export class Controller {
             const validateMoveDown = this._map.detectFullLine().length > 0;
             this._blockMoveTimer = setTimeout(()=>{
                 if(!validateMoveDown) {
-                    this.updateMovingBlockRenderAction(()=>this.blockMoveDown(), idPrefix, c)
+                    this.updateMovingBlockRenderAction(()=>this.blockMoveDown(idPrefix, c), idPrefix, c)
                 }
                 resolve(true);
                 clearTimeout(this._blockMoveTimer)
@@ -127,11 +130,18 @@ export class Controller {
     }
 
 
-    private checkIfFullLines() {
+    private async checkIfFullLines() {
         const fullLines = this._map.detectFullLine();
         if(fullLines.length === 0 ) return ;
-
-        this._map.destroyFullLine();
+        this._blockBundle.controllMove(true);
+        return new Promise((resolve)=>{
+            this._map.fullLineBlink(fullLines, 1000).then(()=>{
+                this._map.destroyFullLine(fullLines)
+                this._blockBundle.controllMove(false)
+                resolve(true)
+            })
+        })
+            
     }
 
     private checkIfMapFull() {

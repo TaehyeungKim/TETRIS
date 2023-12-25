@@ -5,12 +5,15 @@ import { BlockMoveDirection, BlockElementConstructor, BlockElementInterface } fr
 export interface BlockBundleInterface {
     get blockBundleArray(): BlockElementInterface[]
     get blockBundleSetting(): BlockBundleSetting
+    get isFrozen(): boolean
+
     render(idPrefix: string, c: string): void;
     erase(idPrefix: string, c: string): void;
     rotateResultData(): BlockElementCoordinateInfo[];
     rotate(): void;
     move(dir: BlockMoveDirection): void;
     refreshBundle(): void;    
+    controllMove(freeze: boolean): void;
 }
 
 export type BlockBundleConstructor = {
@@ -20,9 +23,11 @@ export type BlockBundleConstructor = {
 export class BlockBundle implements BlockBundleInterface{
 
     private _blockBundleArray: Array<BlockElementInterface>
+    private _moveFrozen: boolean
 
     constructor(private setting: BlockBundleSetting, blockElement: BlockElementConstructor) {
         this._blockBundleArray = setting.coord.map(coord=>new blockElement(coord.x, coord.y))
+        this._moveFrozen = false;
     }
 
     get blockBundleArray() {
@@ -31,6 +36,14 @@ export class BlockBundle implements BlockBundleInterface{
 
     get blockBundleSetting() {
         return this.setting
+    }
+
+    get isFrozen() {
+        return this._moveFrozen
+    }
+
+    controllMove(freeze: boolean) {
+        this._moveFrozen = freeze;
     }
 
     render(idPrefix: string, c: string) {
@@ -49,12 +62,15 @@ export class BlockBundle implements BlockBundleInterface{
     }
 
     rotate() {
-        const {pointX, pointY} = this.setting.point(this._blockBundleArray);
-        this._blockBundleArray.forEach(block=>block.rotate(pointX, pointY))                
+        if(!this._moveFrozen) {
+            const {pointX, pointY} = this.setting.point(this._blockBundleArray);
+            this._blockBundleArray.forEach(block=>block.rotate(pointX, pointY))                
+        }
+        
     }
 
     move(dir: BlockMoveDirection) {
-        this._blockBundleArray.forEach(block=>block.move(dir));
+        if(!this._moveFrozen) this._blockBundleArray.forEach(block=>block.move(dir));
     }
 
     refreshBundle() {
