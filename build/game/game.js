@@ -13,14 +13,18 @@ export class Game extends Controller {
                     this.blockRotate();
                     break;
                 case 'ArrowDown':
-                    this.blockMove('down');
-                    this.blockCrashDown();
+                    this.blockMoveDown();
                     break;
                 case 'ArrowLeft':
                     this.blockMove('left');
                     break;
                 case 'ArrowRight':
                     this.blockMove('right');
+                    break;
+                case ' ':
+                    let crash = this.blockMoveDown();
+                    while (!crash)
+                        crash = this.blockMoveDown();
                     break;
                 default:
                     throw new Error('unsupported key');

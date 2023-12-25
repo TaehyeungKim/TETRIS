@@ -71,6 +71,11 @@ export class Controller {
         }
         this.checkIfFullLines();
         this.checkIfMapFull();
+        return crash;
+    }
+    blockMoveDown() {
+        this.blockMove('down');
+        return this.blockCrashDown();
     }
     checkIfFullLines() {
         const fullLines = this._map.detectFullLine();

@@ -8,9 +8,8 @@ interface ControllerInterface {
     renderMovingBlock(idPrefix: string, c: string): void;
     blockRotate(): void;
     blockMove(dir: BlockMoveDirection): void;
-    blockCrashDown(): void;
     eraseTrackOfMovingBlock(idPrefix: string, c: string): void;
-
+    blockMoveDown(): void;
 }
 
 export class Controller implements ControllerInterface{
@@ -81,7 +80,7 @@ export class Controller implements ControllerInterface{
         if(this.validateMoveCondition(dir)) this._blockBundle.move(dir);
     }
 
-    blockCrashDown() {
+    private blockCrashDown():boolean {
         let crash = false;
         this._blockBundle.blockBundleArray.forEach(block=>{
             if(block.y > this._map.height - 1 || (this._map.map[block.y][block.x])) crash = true;
@@ -94,7 +93,15 @@ export class Controller implements ControllerInterface{
 
         this.checkIfFullLines();
         this.checkIfMapFull();
+
+        return crash;
     }
+
+    blockMoveDown(): boolean {
+        this.blockMove('down');
+        return this.blockCrashDown();
+    }
+
 
     private checkIfFullLines() {
         const fullLines = this._map.detectFullLine();

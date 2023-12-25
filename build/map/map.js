@@ -43,28 +43,12 @@ export class Map extends MapRenderer {
             }
             else {
                 this._map[k].forEach((v, i) => {
-                    if (v === 1) {
+                    if (walk < fullLines.length - 1 && v === 1) {
                         this.fixBlock(i, k + fullLines.length - 1 - walk);
                         this.eraseBlock(i, k);
                     }
                 });
             }
         }
-        // const fullLines = this.detectFullLine().reverse();
-        // if(fullLines.length === 0) return ;
-        // let walk = 0;
-        // this._map.reverse().forEach((row: number[], index:number)=>{
-        //     if(row === fullLines[walk]) {
-        //         row.forEach((_:number, i: number)=>this.eraseBlock(i, this._h-1 - index))
-        //         walk++;
-        //     }
-        //     else if(index < this._map.length - 1) row.forEach((v:number, i: number)=>{
-        //         if(v === 1) {
-        //             this.fixBlock(i, this._h - 1 - (index-walk));
-        //             this.eraseBlock(i, this._h - 1 - index);
-        //         }
-        //     })
-        // })
-        // this._map.reverse();
     }
 }
