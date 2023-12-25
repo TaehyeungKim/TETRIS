@@ -4,6 +4,7 @@ export class Controller {
     constructor(blockBundle, map) {
         this._map = new map(10, 20);
         this._blockBundle = new blockBundle(INITIAL_BLOCK_SETTTING.straight, BlockElement);
+        this._blockMoveTimer = 0;
     }
     validateRotateCondition(x, y) {
         return x >= 0 && x < this._map.width && y >= 0 && y < this._map.height && this._map.map[y][x] === 0;
@@ -32,6 +33,11 @@ export class Controller {
                 throw new Error("do not check other directions");
         }
         return valid;
+    }
+    updateMovingBlockRenderAction(action, idPrefix, c) {
+        this.eraseTrackOfMovingBlock(idPrefix, c);
+        action();
+        this.renderMovingBlock(idPrefix, c);
     }
     renderMap(root) {
         this._map.renderMap(root);
@@ -74,8 +80,27 @@ export class Controller {
         return crash;
     }
     blockMoveDown() {
+        clearTimeout(this._blockMoveTimer);
         this.blockMove('down');
         return this.blockCrashDown();
+    }
+    blockMoveDownToEnd() {
+        let crash = this.blockMoveDown();
+        while (!crash)
+            crash = this.blockMoveDown();
+    }
+    registerAutoBlockMove(idPrefix, c) {
+        const timerPromise = () => new Promise((resolve) => {
+            const validateMoveDown = this._map.detectFullLine().length > 0;
+            this._blockMoveTimer = setTimeout(() => {
+                if (!validateMoveDown) {
+                    this.updateMovingBlockRenderAction(() => this.blockMoveDown(), idPrefix, c);
+                }
+                resolve(true);
+                clearTimeout(this._blockMoveTimer);
+            }, 1000);
+        }).then(timerPromise);
+        timerPromise();
     }
     checkIfFullLines() {
         const fullLines = this._map.detectFullLine();

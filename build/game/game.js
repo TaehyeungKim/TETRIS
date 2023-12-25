@@ -7,32 +7,31 @@ export class Game extends Controller {
     }
     play() {
         const moveByKey = (e) => {
-            this.eraseTrackOfMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
             switch (e.key) {
                 case 'ArrowUp':
-                    this.blockRotate();
+                    this.updateMovingBlockRenderAction(() => this.blockRotate(), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 case 'ArrowDown':
-                    this.blockMoveDown();
+                    this.updateMovingBlockRenderAction(() => this.blockMoveDown(), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
+                    this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 case 'ArrowLeft':
-                    this.blockMove('left');
+                    this.updateMovingBlockRenderAction(() => this.blockMove('left'), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 case 'ArrowRight':
-                    this.blockMove('right');
+                    this.updateMovingBlockRenderAction(() => this.blockMove('right'), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 case ' ':
-                    let crash = this.blockMoveDown();
-                    while (!crash)
-                        crash = this.blockMoveDown();
+                    this.updateMovingBlockRenderAction(() => this.blockMoveDownToEnd(), Game.movingBlockGridPrefix, Game.movingBlockFillClass);
+                    this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 default:
                     throw new Error('unsupported key');
             }
-            this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         };
         this.renderMap(document.getElementById('root'));
         this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
+        this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         window.addEventListener('keydown', moveByKey);
     }
 }

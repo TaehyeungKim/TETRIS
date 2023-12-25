@@ -4,22 +4,25 @@ import {  MapInterface, MapConstructor } from "../map/map.js";
 import { INITIAL_BLOCK_SETTTING } from "../constant.js";
 
 interface ControllerInterface {
-    renderMap(root: HTMLElement): void;
-    renderMovingBlock(idPrefix: string, c: string): void;
-    blockRotate(): void;
-    blockMove(dir: BlockMoveDirection): void;
-    eraseTrackOfMovingBlock(idPrefix: string, c: string): void;
-    blockMoveDown(): void;
+    // renderMap(root: HTMLElement): void;
+    // renderMovingBlock(idPrefix: string, c: string): void;
+    // blockRotate(): void;
+    // blockMove(dir: BlockMoveDirection): void;
+    // eraseTrackOfMovingBlock(idPrefix: string, c: string): void;
+    // blockMoveDown(idPrefix: string, c: string): void;
+    
 }
 
 export class Controller implements ControllerInterface{
 
     private _map: MapInterface
-    private _blockBundle: BlockBundleInterface
+    private _blockBundle: BlockBundleInterface;
+    private _blockMoveTimer: number;
 
     constructor(blockBundle:BlockBundleConstructor, map: MapConstructor) {
         this._map = new map(10,20);
         this._blockBundle = new blockBundle(INITIAL_BLOCK_SETTTING.straight, BlockElement);
+        this._blockMoveTimer = 0;
     }
 
     private validateRotateCondition(x:number, y:number) {
@@ -51,6 +54,12 @@ export class Controller implements ControllerInterface{
         return valid;
     }
 
+    updateMovingBlockRenderAction(action:()=>unknown, idPrefix: string, c: string) {
+        this.eraseTrackOfMovingBlock(idPrefix, c)
+        action()
+        this.renderMovingBlock(idPrefix, c)
+    } 
+
     renderMap(root: HTMLElement) {
         this._map.renderMap(root);
     }
@@ -59,11 +68,11 @@ export class Controller implements ControllerInterface{
         this._blockBundle.render(idPrefix, c);
     }
 
-    eraseTrackOfMovingBlock(idPrefix: string, c: string) {
+    private eraseTrackOfMovingBlock(idPrefix: string, c: string) {
         this._blockBundle.erase(idPrefix, c)
     }
 
-    blockRotate() {
+    protected blockRotate() {
         const {pointX, pointY} = this._blockBundle.blockBundleSetting.point(this._blockBundle.blockBundleArray)
         let valid = true;
         this._blockBundle.blockBundleArray.forEach(block=>{
@@ -76,7 +85,7 @@ export class Controller implements ControllerInterface{
         this._blockBundle.blockBundleArray.forEach((block=>block.rotate(pointX, pointY)));
     }
 
-    blockMove(dir: BlockMoveDirection) {
+    protected blockMove(dir: BlockMoveDirection) {
         if(this.validateMoveCondition(dir)) this._blockBundle.move(dir);
     }
 
@@ -97,9 +106,30 @@ export class Controller implements ControllerInterface{
         return crash;
     }
 
-    blockMoveDown(): boolean {
+    protected blockMoveDown(): boolean {
+        clearTimeout(this._blockMoveTimer);
         this.blockMove('down');
         return this.blockCrashDown();
+    }
+
+    protected blockMoveDownToEnd() {
+        let crash: boolean = this.blockMoveDown();
+        while(!crash) crash = this.blockMoveDown();
+    }
+
+    protected registerAutoBlockMove(idPrefix: string, c: string) {
+        const timerPromise:()=>Promise<boolean> = () => new Promise<boolean>((resolve)=>{
+            const validateMoveDown = this._map.detectFullLine().length > 0;
+            this._blockMoveTimer = setTimeout(()=>{
+                if(!validateMoveDown) {
+                    this.updateMovingBlockRenderAction(()=>this.blockMoveDown(), idPrefix, c)
+                }
+                resolve(true);
+                clearTimeout(this._blockMoveTimer)
+            },1000)
+        }).then(timerPromise)
+
+        timerPromise();
     }
 
 
