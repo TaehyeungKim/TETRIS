@@ -2,7 +2,12 @@ import { Controller } from "./controller.js";
 import { BlockBundle } from "../block/blockBundle.js";
 import { Map } from "../map/map.js";
 
-export class Game extends Controller {
+export interface GameInterface {
+    play(): void;
+    pause(): void
+}
+
+export class Game extends Controller implements GameInterface{
 
     private static movingBlockGridPrefix: string = 'moving-block-grid'
     private static movingBlockFillClass: string = 'fill-moving-block'
@@ -11,10 +16,13 @@ export class Game extends Controller {
         super(BlockBundle, Map)
     }
 
+    pause() {
+        this.pauseBlockMoving()
+    }
+
 
     play() {
         const moveByKey = (e: KeyboardEvent) => {
-            
             switch(e.key) {
                 case 'ArrowUp': 
                     this.updateMovingBlockRenderAction(()=>this.blockRotate(), Game.movingBlockGridPrefix, Game.movingBlockFillClass)
@@ -37,7 +45,7 @@ export class Game extends Controller {
                     this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass)
                     break;
                 default:
-                    throw new Error('unsupported key');
+                    return ;
             }
         }
 

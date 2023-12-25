@@ -48,6 +48,9 @@ export class Controller {
     eraseTrackOfMovingBlock(idPrefix, c) {
         this._blockBundle.erase(idPrefix, c);
     }
+    pauseBlockMoving() {
+        clearTimeout(this._blockMoveTimer);
+    }
     blockRotate() {
         const { pointX, pointY } = this._blockBundle.blockBundleSetting.point(this._blockBundle.blockBundleArray);
         let valid = true;

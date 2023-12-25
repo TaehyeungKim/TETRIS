@@ -5,6 +5,9 @@ export class Game extends Controller {
     constructor() {
         super(BlockBundle, Map);
     }
+    pause() {
+        this.pauseBlockMoving();
+    }
     play() {
         const moveByKey = (e) => {
             switch (e.key) {
@@ -26,7 +29,7 @@ export class Game extends Controller {
                     this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
                     break;
                 default:
-                    throw new Error('unsupported key');
+                    return;
             }
         };
         this.renderMap(document.getElementById('root'));

@@ -3,17 +3,7 @@ import { BlockElement, BlockMoveDirection } from "../block/blockElement.js";
 import {  MapInterface, MapConstructor } from "../map/map.js";
 import { INITIAL_BLOCK_SETTTING } from "../constant.js";
 
-interface ControllerInterface {
-    // renderMap(root: HTMLElement): void;
-    // renderMovingBlock(idPrefix: string, c: string): void;
-    // blockRotate(): void;
-    // blockMove(dir: BlockMoveDirection): void;
-    // eraseTrackOfMovingBlock(idPrefix: string, c: string): void;
-    // blockMoveDown(idPrefix: string, c: string): void;
-    
-}
-
-export class Controller implements ControllerInterface{
+export class Controller {
 
     private _map: MapInterface
     private _blockBundle: BlockBundleInterface;
@@ -70,6 +60,10 @@ export class Controller implements ControllerInterface{
 
     private eraseTrackOfMovingBlock(idPrefix: string, c: string) {
         this._blockBundle.erase(idPrefix, c)
+    }
+
+    protected pauseBlockMoving() {
+        clearTimeout(this._blockMoveTimer)
     }
 
     protected blockRotate() {
