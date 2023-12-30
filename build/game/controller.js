@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { BlockElement } from "../block/blockElement.js";
-import { INITIAL_BLOCK_SETTTING } from "../constant.js";
+import { INITIAL_BLOCK_SETTTING, MAP_WIDTH } from "../constant.js";
 import { Player } from "./player.js";
 export class Controller {
     constructor(blockBundle, map) {
@@ -45,19 +45,35 @@ export class Controller {
         }
         return valid;
     }
-    updateMovingBlockRenderAction(action, idPrefix, c) {
+    renderPreviewNext() {
+        this._blockBundle.nextBlockBundleSetting.coord.forEach((coord) => {
+            var _a;
+            (_a = document.getElementById(`preview-grid_${coord.y * 4 + coord.x}`)) === null || _a === void 0 ? void 0 : _a.classList.add('preview-fill');
+        });
+    }
+    erasePreviewNext() {
+        this._blockBundle.blockBundleSetting.coord.forEach(coord => {
+            var _a;
+            (_a = document.getElementById(`preview-grid_${coord.y * 4 + coord.x}`)) === null || _a === void 0 ? void 0 : _a.classList.remove('preview-fill');
+        });
+    }
+    updateMovingBlockRenderAction(action, idPrefix, c, prev = false) {
         this.eraseTrackOfMovingBlock(idPrefix, c);
         action();
-        this.renderMovingBlock(idPrefix, c);
+        this.renderMovingBlock(idPrefix, c, prev);
     }
     renderMap(root) {
         this._map.renderMap(root);
     }
-    renderMovingBlock(idPrefix, c) {
-        this._blockBundle.render(idPrefix, c);
+    renderMovingBlock(idPrefix, c, prev = false) {
+        this._blockBundle.render(idPrefix, c, MAP_WIDTH);
+        if (prev) {
+            this.erasePreviewNext();
+            this.renderPreviewNext();
+        }
     }
     eraseTrackOfMovingBlock(idPrefix, c) {
-        this._blockBundle.erase(idPrefix, c);
+        this._blockBundle.erase(idPrefix, c, MAP_WIDTH);
     }
     pauseBlockMoving() {
         clearTimeout(this._blockMoveTimer);
@@ -87,7 +103,7 @@ export class Controller {
         if (crash) {
             this._blockBundle.move('up');
             this._blockBundle.blockBundleArray.forEach(block => this._map.fixBlock(block.x, block.y));
-            this.checkIfFullLines().then(() => this.updateMovingBlockRenderAction(() => this._blockBundle.refreshBundle(), idPrefix, c));
+            this.checkIfFullLines().then(() => this.updateMovingBlockRenderAction(() => this._blockBundle.refreshBundle(), idPrefix, c, true));
         }
         this.checkIfMapFull();
         return crash;

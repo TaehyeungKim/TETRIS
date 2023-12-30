@@ -38,12 +38,12 @@ export class BlockElement {
         this._x = x;
         this._y = y;
     }
-    renderFill(idPrefix, c) {
+    renderFill(idPrefix, c, w) {
         var _a;
-        (_a = document.getElementById(`${idPrefix}_${this._y * 10 + this._x}`)) === null || _a === void 0 ? void 0 : _a.classList.add(c);
+        (_a = document.getElementById(`${idPrefix}_${this._y * w + this._x}`)) === null || _a === void 0 ? void 0 : _a.classList.add(c);
     }
-    erase(idPrefix, c) {
+    erase(idPrefix, c, w) {
         var _a;
-        (_a = document.getElementById(`${idPrefix}_${this._y * 10 + this._x}`)) === null || _a === void 0 ? void 0 : _a.classList.remove(c);
+        (_a = document.getElementById(`${idPrefix}_${this._y * w + this._x}`)) === null || _a === void 0 ? void 0 : _a.classList.remove(c);
     }
 }

@@ -1,6 +1,7 @@
 import { Controller } from "./controller.js";
 import { BlockBundle } from "../block/blockBundle.js";
 import { Map } from "../map/map.js";
+import { PreviewMap } from "../map/preview.js";
 
 export interface GameInterface {
     play(): void;
@@ -12,8 +13,11 @@ export class Game extends Controller implements GameInterface{
     private static movingBlockGridPrefix: string = 'moving-block-grid'
     private static movingBlockFillClass: string = 'fill-moving-block'
 
+    private static previewMap: PreviewMap = new PreviewMap();
+
     constructor() {
         super(BlockBundle, Map)
+        Game.previewMap.renderPreviewMap(document.getElementById('preview-next-container') as HTMLElement)
     }
 
     pause() {
@@ -50,7 +54,7 @@ export class Game extends Controller implements GameInterface{
         }
 
         this.renderMap(document.getElementById('game-grid') as HTMLElement)
-        this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass)
+        this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass, true)
         this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         window.addEventListener('keydown', moveByKey)
 

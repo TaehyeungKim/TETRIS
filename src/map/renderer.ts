@@ -1,6 +1,6 @@
 import { MAP_WIDTH, MAP_HEIGHT } from "../constant.js";
 
-class Renderer {
+export class Renderer {
 
     protected makeElement(htmlTag: keyof HTMLElementTagNameMap, id: string, c?: string):HTMLElement {
         const element =  document.createElement(`${htmlTag}`);
@@ -14,6 +14,15 @@ class Renderer {
         if(!parent) throw new Error(`${parent} is not in the document`)
         if(inlineStyle) target.setAttribute('style', inlineStyle)
         parent.appendChild(target)
+    }
+
+    protected generateGrid(w: number, h: number, container: HTMLElement, childId: string) {
+        for(let i = 0; i < h; i++) {
+            for(let j = 0; j < w; j++) {
+                const blockGrid = this.makeElement('div', `${childId}_${i*w + j}`, childId)
+                this.render(container,blockGrid);
+            }
+        }
     }
 }
 
@@ -34,21 +43,14 @@ export class MapRenderer extends Renderer implements MapRendererInterface{
     z-index: -1;
     `
 
-    private generateGrid(container: HTMLElement, childId: string) {
-        for(let i = 0; i < MAP_HEIGHT; i++) {
-            for(let j = 0; j < MAP_WIDTH; j++) {
-                const blockGrid = this.makeElement('div', `${childId}_${i*10 + j}`, childId)
-                this.render(container,blockGrid);
-            }
-        }
-    }
+    
 
     renderMap(root: HTMLElement) {
         const mapGrid = this.makeElement('div', 'map-grid');
         const mapOverlapGrid = this.makeElement('div', 'map-overlap-grid')
 
-        this.generateGrid(mapGrid, 'block-grid');
-        this.generateGrid(mapOverlapGrid, 'moving-block-grid');
+        this.generateGrid(MAP_WIDTH, MAP_HEIGHT, mapGrid, 'block-grid');
+        this.generateGrid(MAP_WIDTH, MAP_HEIGHT, mapOverlapGrid, 'moving-block-grid');
 
         this.render(root, mapGrid, MapRenderer.mapGridTemplate);
         this.render(root, mapOverlapGrid, MapRenderer.mapOverlapGridTemplate);

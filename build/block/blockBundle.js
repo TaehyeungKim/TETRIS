@@ -4,6 +4,10 @@ export class BlockBundle {
         this.setting = setting;
         this._blockBundleArray = setting.coord.map(coord => new blockElement(coord.x, coord.y));
         this._moveFrozen = false;
+        this._nextBlockBundle = this.setNextBlockBundle();
+    }
+    get nextBlockBundleSetting() {
+        return this._nextBlockBundle;
     }
     get blockBundleArray() {
         return this._blockBundleArray;
@@ -17,11 +21,11 @@ export class BlockBundle {
     controllMove(freeze) {
         this._moveFrozen = freeze;
     }
-    render(idPrefix, c) {
-        this._blockBundleArray.forEach(block => block.renderFill(idPrefix, c));
+    render(idPrefix, c, w) {
+        this._blockBundleArray.forEach(block => block.renderFill(idPrefix, c, w));
     }
-    erase(idPrefix, c) {
-        this._blockBundleArray.forEach(block => block.erase(idPrefix, c));
+    erase(idPrefix, c, w) {
+        this._blockBundleArray.forEach(block => block.erase(idPrefix, c, w));
     }
     rotateResultData() {
         const { pointX, pointY } = this.setting.point(this._blockBundleArray);
@@ -37,16 +41,20 @@ export class BlockBundle {
         if (!this._moveFrozen)
             this._blockBundleArray.forEach(block => block.move(dir));
     }
-    refreshBundle() {
+    setNextBlockBundle() {
         const randomGen = () => Number.parseInt((Math.random() * 10).toString());
         let random = randomGen();
         while (random >= BUNDLE_TYPE_ARRAY.length)
             random = randomGen();
         const newType = BUNDLE_TYPE_ARRAY[random];
-        this.setting = INITIAL_BLOCK_SETTTING[newType];
+        return INITIAL_BLOCK_SETTTING[newType];
+    }
+    refreshBundle() {
+        this.setting = this._nextBlockBundle;
         this._blockBundleArray.forEach((block, index) => {
             block.x = this.setting.coord[index].x;
             block.y = this.setting.coord[index].y;
         });
+        this._nextBlockBundle = this.setNextBlockBundle();
     }
 }

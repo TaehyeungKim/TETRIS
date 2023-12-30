@@ -11,8 +11,8 @@ export interface BlockElementInterface {
 
     rotate(pointX: number, pointY: number, reverse?: boolean):void
     rotateResultData(pointX: number, pointY: number, reverse?:boolean): BlockElementCoordinateInfo
-    renderFill(idPrefix: string, c: string):void
-    erase(idPrefix: string, c: string): void;
+    renderFill(idPrefix: string, c: string, w: number):void
+    erase(idPrefix: string, c: string, w: number): void;
     move(dir: BlockMoveDirection): void|never;
 }
 export type BlockElementConstructor = {
@@ -61,11 +61,11 @@ export class BlockElement implements BlockElementInterface{
         this._y = y;
     }
 
-    renderFill(idPrefix: string, c: string) {
-        document.getElementById(`${idPrefix}_${this._y*10 + this._x}`)?.classList.add(c)
+    renderFill(idPrefix: string, c: string, w: number) {
+        document.getElementById(`${idPrefix}_${this._y*w + this._x}`)?.classList.add(c)
     }
 
-    erase(idPrefix: string, c: string) {
-        document.getElementById(`${idPrefix}_${this._y*10 + this._x}`)?.classList.remove(c)
+    erase(idPrefix: string, c: string, w: number) {
+        document.getElementById(`${idPrefix}_${this._y*w + this._x}`)?.classList.remove(c)
     }
 }

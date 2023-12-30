@@ -1,12 +1,12 @@
 import {  BlockBundleInterface, BlockBundleConstructor } from "../block/blockBundle.js";
 import { BlockElement, BlockMoveDirection } from "../block/blockElement.js";
 import {  MapInterface, MapConstructor } from "../map/map.js";
-import { INITIAL_BLOCK_SETTTING } from "../constant.js";
+import { INITIAL_BLOCK_SETTTING, MAP_WIDTH } from "../constant.js";
 import { Player, PlayerInterface } from "./player.js";
 
 export class Controller {
 
-    private _map: MapInterface
+    private _map: MapInterface 
     private _blockBundle: BlockBundleInterface;
     private _blockMoveTimer: number;
 
@@ -48,22 +48,38 @@ export class Controller {
         return valid;
     }
 
-    updateMovingBlockRenderAction(action:()=>unknown, idPrefix: string, c: string) {
+    private renderPreviewNext() {
+        this._blockBundle.nextBlockBundleSetting.coord.forEach((coord)=>{
+            document.getElementById(`preview-grid_${coord.y*4+coord.x}`)?.classList.add('preview-fill')
+        })
+    }
+
+    private erasePreviewNext() {
+        this._blockBundle.blockBundleSetting.coord.forEach(coord=>{
+            document.getElementById(`preview-grid_${coord.y*4+coord.x}`)?.classList.remove('preview-fill')
+        })
+    }
+
+    updateMovingBlockRenderAction(action:()=>unknown, idPrefix: string, c: string, prev:boolean=false) {
         this.eraseTrackOfMovingBlock(idPrefix, c)
         action()
-        this.renderMovingBlock(idPrefix, c)
+        this.renderMovingBlock(idPrefix, c, prev)
     } 
 
     renderMap(root: HTMLElement) {
         this._map.renderMap(root);
     }
 
-    renderMovingBlock(idPrefix: string, c: string) {
-        this._blockBundle.render(idPrefix, c);
+    renderMovingBlock(idPrefix: string, c: string, prev:boolean=false) {
+        this._blockBundle.render(idPrefix, c, MAP_WIDTH);
+        if(prev) {
+            this.erasePreviewNext();
+            this.renderPreviewNext();
+        }
     }
 
     private eraseTrackOfMovingBlock(idPrefix: string, c: string) {
-        this._blockBundle.erase(idPrefix, c)
+        this._blockBundle.erase(idPrefix, c, MAP_WIDTH)
     }
 
     protected pauseBlockMoving() {
@@ -95,7 +111,7 @@ export class Controller {
         if(crash) {
             this._blockBundle.move('up');
             this._blockBundle.blockBundleArray.forEach(block=>this._map.fixBlock(block.x, block.y))
-            this.checkIfFullLines().then(()=>this.updateMovingBlockRenderAction(()=>this._blockBundle.refreshBundle(), idPrefix, c))
+            this.checkIfFullLines().then(()=>this.updateMovingBlockRenderAction(()=>this._blockBundle.refreshBundle(), idPrefix, c, true))
         }
 
         
@@ -124,6 +140,7 @@ export class Controller {
             this._blockMoveTimer = setTimeout(()=>{
                 if(!validateMoveDown) {
                     this.updateMovingBlockRenderAction(()=>this.blockMoveDown(idPrefix, c), idPrefix, c)
+
                 }
                 resolve(true);
                 clearTimeout(this._blockMoveTimer)

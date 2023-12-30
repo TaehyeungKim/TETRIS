@@ -1,9 +1,11 @@
 import { Controller } from "./controller.js";
 import { BlockBundle } from "../block/blockBundle.js";
 import { Map } from "../map/map.js";
+import { PreviewMap } from "../map/preview.js";
 export class Game extends Controller {
     constructor() {
         super(BlockBundle, Map);
+        Game.previewMap.renderPreviewMap(document.getElementById('preview-next-container'));
     }
     pause() {
         this.pauseBlockMoving();
@@ -34,7 +36,7 @@ export class Game extends Controller {
             }
         };
         this.renderMap(document.getElementById('game-grid'));
-        this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
+        this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass, true);
         this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         window.addEventListener('keydown', moveByKey);
         this._player.startTimer(document.getElementById('time'));
@@ -42,3 +44,4 @@ export class Game extends Controller {
 }
 Game.movingBlockGridPrefix = 'moving-block-grid';
 Game.movingBlockFillClass = 'fill-moving-block';
+Game.previewMap = new PreviewMap();

@@ -6,9 +6,10 @@ export interface BlockBundleInterface {
     get blockBundleArray(): BlockElementInterface[]
     get blockBundleSetting(): BlockBundleSetting
     get isFrozen(): boolean
+    get nextBlockBundleSetting(): BlockBundleSetting
 
-    render(idPrefix: string, c: string): void;
-    erase(idPrefix: string, c: string): void;
+    render(idPrefix: string, c: string, w: number): void;
+    erase(idPrefix: string, c: string, w: number): void;
     rotateResultData(): BlockElementCoordinateInfo[];
     rotate(): void;
     move(dir: BlockMoveDirection): void;
@@ -24,10 +25,16 @@ export class BlockBundle implements BlockBundleInterface{
 
     private _blockBundleArray: Array<BlockElementInterface>
     private _moveFrozen: boolean
+    private _nextBlockBundle: BlockBundleSetting
 
     constructor(private setting: BlockBundleSetting, blockElement: BlockElementConstructor) {
         this._blockBundleArray = setting.coord.map(coord=>new blockElement(coord.x, coord.y))
         this._moveFrozen = false;
+        this._nextBlockBundle = this.setNextBlockBundle();
+    }
+
+    get nextBlockBundleSetting() {
+        return this._nextBlockBundle;
     }
 
     get blockBundleArray() {
@@ -46,13 +53,14 @@ export class BlockBundle implements BlockBundleInterface{
         this._moveFrozen = freeze;
     }
 
-    render(idPrefix: string, c: string) {
-        this._blockBundleArray.forEach(block=>block.renderFill(idPrefix, c))
+    render(idPrefix: string, c: string, w: number) {
+        this._blockBundleArray.forEach(block=>block.renderFill(idPrefix, c, w))
     }
 
-    erase(idPrefix: string, c: string) {
-        this._blockBundleArray.forEach(block=>block.erase(idPrefix, c))
+    erase(idPrefix: string, c: string, w: number) {
+        this._blockBundleArray.forEach(block=>block.erase(idPrefix, c, w))
     }
+
 
     
 
@@ -73,16 +81,23 @@ export class BlockBundle implements BlockBundleInterface{
         if(!this._moveFrozen) this._blockBundleArray.forEach(block=>block.move(dir));
     }
 
-    refreshBundle() {
+    private setNextBlockBundle():BlockBundleSetting {
         const randomGen = () => Number.parseInt((Math.random()*10).toString());
         let random = randomGen();
         while(random >= BUNDLE_TYPE_ARRAY.length) random = randomGen();
 
         const newType = BUNDLE_TYPE_ARRAY[random];
-        this.setting = INITIAL_BLOCK_SETTTING[newType];
+        return INITIAL_BLOCK_SETTTING[newType]
+    }
+
+    refreshBundle() {
+        this.setting = this._nextBlockBundle;
+
         this._blockBundleArray.forEach((block: BlockElementInterface, index: number)=>{
             block.x = this.setting.coord[index].x; 
             block.y = this.setting.coord[index].y;
         })
+
+        this._nextBlockBundle = this.setNextBlockBundle();
     }
 }
