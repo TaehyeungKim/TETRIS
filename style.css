@@ -37,3 +37,25 @@ body {
 .fullLine-grid-blink {
     animation: gridBlink 1s ease-in-out;
 }
+
+
+.toy {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto 0;
+}
+
+.toy .title {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.toy .time-score {
+    display: flex;
+}
+
+.toy .time-score .time, .toy .time-score .score {
+    width: 50%;
+    text-align: center;
+    box-sizing: border-box;
+}

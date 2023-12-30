@@ -7,6 +7,7 @@ export class Game extends Controller {
     }
     pause() {
         this.pauseBlockMoving();
+        this._player.endTimer();
     }
     play() {
         const moveByKey = (e) => {
@@ -32,10 +33,11 @@ export class Game extends Controller {
                     return;
             }
         };
-        this.renderMap(document.getElementById('root'));
+        this.renderMap(document.getElementById('game-grid'));
         this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         window.addEventListener('keydown', moveByKey);
+        this._player.startTimer(document.getElementById('time'));
     }
 }
 Game.movingBlockGridPrefix = 'moving-block-grid';

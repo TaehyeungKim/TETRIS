@@ -2,12 +2,16 @@ import {  BlockBundleInterface, BlockBundleConstructor } from "../block/blockBun
 import { BlockElement, BlockMoveDirection } from "../block/blockElement.js";
 import {  MapInterface, MapConstructor } from "../map/map.js";
 import { INITIAL_BLOCK_SETTTING } from "../constant.js";
+import { Player, PlayerInterface } from "./player.js";
 
 export class Controller {
 
     private _map: MapInterface
     private _blockBundle: BlockBundleInterface;
     private _blockMoveTimer: number;
+
+    protected _player: PlayerInterface = new Player();
+
 
     constructor(blockBundle:BlockBundleConstructor, map: MapConstructor) {
         this._map = new map(10,20);
@@ -138,6 +142,8 @@ export class Controller {
             this._map.fullLineBlink(fullLines, 1000).then(()=>{
                 this._map.destroyFullLine(fullLines)
                 this._blockBundle.controllMove(false)
+                this._player.updateScore(fullLines.length * 50, document.getElementById('score') as HTMLElement);
+                
                 resolve(true)
             })
         })
@@ -147,4 +153,5 @@ export class Controller {
     private checkIfMapFull() {
        if(this._map.map[0].reduce((a,b)=>a+b)===10) console.log('fail')
     }
+
 }

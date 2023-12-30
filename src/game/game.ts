@@ -18,6 +18,7 @@ export class Game extends Controller implements GameInterface{
 
     pause() {
         this.pauseBlockMoving()
+        this._player.endTimer()
     }
 
 
@@ -48,9 +49,11 @@ export class Game extends Controller implements GameInterface{
             }
         }
 
-        this.renderMap(document.getElementById('root') as HTMLElement)
+        this.renderMap(document.getElementById('game-grid') as HTMLElement)
         this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass)
         this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         window.addEventListener('keydown', moveByKey)
+
+        this._player.startTimer(document.getElementById('time') as HTMLElement);
     }
 }

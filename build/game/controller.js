@@ -9,8 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { BlockElement } from "../block/blockElement.js";
 import { INITIAL_BLOCK_SETTTING } from "../constant.js";
+import { Player } from "./player.js";
 export class Controller {
     constructor(blockBundle, map) {
+        this._player = new Player();
         this._map = new map(10, 20);
         this._blockBundle = new blockBundle(INITIAL_BLOCK_SETTTING.straight, BlockElement);
         this._blockMoveTimer = 0;
@@ -125,6 +127,7 @@ export class Controller {
                 this._map.fullLineBlink(fullLines, 1000).then(() => {
                     this._map.destroyFullLine(fullLines);
                     this._blockBundle.controllMove(false);
+                    this._player.updateScore(fullLines.length * 50, document.getElementById('score'));
                     resolve(true);
                 });
             });
