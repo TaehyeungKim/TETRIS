@@ -7,6 +7,8 @@ export interface BlockBundleInterface {
     get blockBundleSetting(): BlockBundleSetting
     get isFrozen(): boolean
     get nextBlockBundleSetting(): BlockBundleSetting
+    get crashed(): boolean
+    set crashed(c: boolean)
 
     render(idPrefix: string, c: string, w: number): void;
     erase(idPrefix: string, c: string, w: number): void;
@@ -26,11 +28,21 @@ export class BlockBundle implements BlockBundleInterface{
     private _blockBundleArray: Array<BlockElementInterface>
     private _moveFrozen: boolean
     private _nextBlockBundle: BlockBundleSetting
+    private _crashed: boolean
 
     constructor(private setting: BlockBundleSetting, blockElement: BlockElementConstructor) {
         this._blockBundleArray = setting.coord.map(coord=>new blockElement(coord.x, coord.y))
         this._moveFrozen = false;
         this._nextBlockBundle = this.setNextBlockBundle();
+        this._crashed = false;
+    }
+
+    get crashed() {
+        return this._crashed
+    }
+
+    set crashed(c: boolean) {
+        this._crashed = c
     }
 
     get nextBlockBundleSetting() {
@@ -54,11 +66,16 @@ export class BlockBundle implements BlockBundleInterface{
     }
 
     render(idPrefix: string, c: string, w: number) {
-        this._blockBundleArray.forEach(block=>block.renderFill(idPrefix, c, w))
+        if(!this._crashed){
+            this._blockBundleArray.forEach(block=>block.renderFill(idPrefix, c, w))
+            this._blockBundleArray.forEach(block=>block.renderFill(idPrefix, `${this.setting.type}-fill`, w));
+        }
+        
     }
 
     erase(idPrefix: string, c: string, w: number) {
         this._blockBundleArray.forEach(block=>block.erase(idPrefix, c, w))
+        this._blockBundleArray.forEach(block=>block.erase(idPrefix, `${this.setting.type}-fill`, w));
     }
 
 
@@ -91,6 +108,7 @@ export class BlockBundle implements BlockBundleInterface{
     }
 
     refreshBundle() {
+        this._crashed = false;
         this.setting = this._nextBlockBundle;
 
         this._blockBundleArray.forEach((block: BlockElementInterface, index: number)=>{

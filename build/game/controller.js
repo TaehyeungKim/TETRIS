@@ -18,7 +18,7 @@ export class Controller {
         this._blockMoveTimer = 0;
     }
     validateRotateCondition(x, y) {
-        return x >= 0 && x < this._map.width && y >= 0 && y < this._map.height && this._map.map[y][x] === 0;
+        return x >= 0 && x < this._map.width && y >= 0 && y < this._map.height && this._map.map[y][x].filled === 0;
     }
     validateMoveCondition(dir) {
         const coords = this._blockBundle.blockBundleArray.map(block => {
@@ -28,13 +28,13 @@ export class Controller {
         switch (dir) {
             case "left":
                 coords.forEach(coord => {
-                    if (coord.x - 1 < 0 || this._map.map[coord.y][coord.x - 1] === 1)
+                    if (coord.x - 1 < 0 || this._map.map[coord.y][coord.x - 1].filled === 1)
                         valid = false;
                 });
                 break;
             case "right":
                 coords.forEach(coord => {
-                    if (coord.x + 1 > this._map.width - 1 || this._map.map[coord.y][coord.x + 1] === 1)
+                    if (coord.x + 1 > this._map.width - 1 || this._map.map[coord.y][coord.x + 1].filled === 1)
                         valid = false;
                 });
                 break;
@@ -97,13 +97,18 @@ export class Controller {
     checkBlockCrashDown(idPrefix, c) {
         let crash = false;
         this._blockBundle.blockBundleArray.forEach(block => {
-            if (block.y > this._map.height - 1 || (this._map.map[block.y][block.x]))
+            if (block.y > this._map.height - 1 || (this._map.map[block.y][block.x].filled === 1))
                 crash = true;
         });
         if (crash) {
+            this._blockBundle.crashed = true;
             this._blockBundle.move('up');
-            this._blockBundle.blockBundleArray.forEach(block => this._map.fixBlock(block.x, block.y));
-            this.checkIfFullLines().then(() => this.updateMovingBlockRenderAction(() => this._blockBundle.refreshBundle(), idPrefix, c, true));
+            this._blockBundle.blockBundleArray.forEach(block => {
+                this._map.fixBlock(block.x, block.y, this._blockBundle.blockBundleSetting.type);
+            });
+            this.checkIfFullLines().then(() => {
+                this.updateMovingBlockRenderAction(() => this._blockBundle.refreshBundle(), idPrefix, c, true);
+            });
         }
         this.checkIfMapFull();
         return crash;
@@ -150,7 +155,7 @@ export class Controller {
         });
     }
     checkIfMapFull() {
-        if (this._map.map[0].reduce((a, b) => a + b) === 10)
+        if (this._map.map[0].reduce((a, b) => a + b.filled, 0) === 10)
             console.log('fail');
     }
 }

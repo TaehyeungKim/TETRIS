@@ -17,7 +17,7 @@ export class Map extends MapRenderer {
         for (let i = 0; i < this._h; i++)
             this._map.push([]);
         this._map.forEach(row => { for (let k = 0; k < this._w; k++)
-            row.push(0); });
+            row.push({ type: null, filled: 0 }); });
     }
     get map() {
         return this._map;
@@ -29,16 +29,21 @@ export class Map extends MapRenderer {
         return this._h;
     }
     detectFullLine() {
-        const fullLines = this._map.filter(line => line.reduce((a, b) => a + b) === 10);
+        const fullLines = this._map.filter(line => line.reduce((a, b) => a + b.filled, 0) === 10);
         return fullLines;
     }
-    fixBlock(x, y) {
-        this._map[y][x] = 1;
+    fixBlock(x, y, type) {
+        this._map[y][x].filled = 1;
+        this._map[y][x].type = type;
+        this.modifyGridByClass(`block-grid_${y * 10 + x}`, `${type}-fill`, 'add');
         this.modifyGridByClass(`block-grid_${y * 10 + x}`, 'fill-fixed-block', 'add');
     }
     eraseBlock(x, y) {
-        this._map[y][x] = 0;
+        const prevInfo = this._map[y][x];
+        this.modifyGridByClass(`block-grid_${y * 10 + x}`, `${prevInfo.type}-fill`, 'remove');
         this.modifyGridByClass(`block-grid_${y * 10 + x}`, 'fill-fixed-block', 'remove');
+        prevInfo.filled = 0;
+        prevInfo.type = null;
     }
     fullLineBlink(fullLines, blinkTime) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -80,8 +85,8 @@ export class Map extends MapRenderer {
             }
             else {
                 this._map[k].forEach((v, i) => {
-                    if (walk < fullLines.length - 1 && v === 1) {
-                        this.fixBlock(i, k + fullLines.length - 1 - walk);
+                    if (walk < fullLines.length - 1 && v.filled === 1 && v.type) {
+                        this.fixBlock(i, k + fullLines.length - 1 - walk, v.type);
                         this.eraseBlock(i, k);
                     }
                 });

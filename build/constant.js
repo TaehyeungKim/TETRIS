@@ -25,7 +25,7 @@ export const INITIAL_BLOCK_SETTTING = Object.freeze({
     straight: {
         type: 'straight',
         coord: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }],
-        point: normalPointSetter(1)
+        point: normalPointSetter(1),
     },
     shapeL: {
         type: 'shapeL',
@@ -44,8 +44,8 @@ export const INITIAL_BLOCK_SETTTING = Object.freeze({
     },
     fuck: {
         type: 'fuck',
-        coord: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }],
-        point: normalPointSetter(2)
+        coord: [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 0 }],
+        point: normalPointSetter(1)
     },
     zigzag: {
         type: 'zigzag',

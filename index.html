@@ -4,20 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TETRIS</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="./style/style.css">
+    
 </head>
 <body>
-    <main class="toy">
+    <main class="toy border border-3 rounded-3 shadow">
         <header class="title">TETRIS</header>
         <div class="time-score">
             <div class="time" id="time">00:00:00</div>
             <div class="score" id="score">0</div>
         </div>
         <div class="game-container">
-            <section class = "game" id="game-grid"></section>
-            <div id="preview-next-container">
-                
-            </div>
+            <section class="game" id="game-grid"></section>
+            <section class="right">
+                <div class="preview-next-container" id="preview-next-container"> 
+                    <div class="preview-heading">Next</div>
+                </div>
+            </section>
+            
         </div>
         
     </main>

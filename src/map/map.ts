@@ -1,32 +1,38 @@
 
+import { BlockBundleType } from "../constant.js";
 import { MapRenderer, MapRendererInterface } from "./renderer.js";
 
 export interface MapInterface extends MapRendererInterface {
-    get map(): number[][];
+    get map(): MapGridInfo[][];
     get width(): number;
     get height(): number;
 
-    detectFullLine(): number[][];
-    fixBlock(x: number, y: number): void;
+    detectFullLine(): MapGridInfo[][];
+    fixBlock(x: number, y: number, type: BlockBundleType): void;
     eraseBlock(x:number, y:number): void;
-    destroyFullLine(fullLines: number[][]): void;
-    fullLineBlink(fullLines: number[][], blinkTime: number): Promise<boolean>
+    destroyFullLine(fullLines: MapGridInfo[][]): void;
+    fullLineBlink(fullLines: MapGridInfo[][], blinkTime: number): Promise<boolean>
 }
 
 export type MapConstructor = {
     new(_w: number, _h: number): MapInterface
 }
 
+export type MapGridInfo = {
+    type: BlockBundleType|null,
+    filled: 0|1
+}
+
 export class Map extends MapRenderer implements MapInterface {
 
-    private _map: Array<Array<number>>;
+    private _map: Array<Array<MapGridInfo>>;
     private static gridBlinkClass: string = 'fullLine-grid-blink'
 
     constructor(private _w: number, private _h: number) {
         super();
         this._map = [];
         for(let i = 0; i < this._h; i++) this._map.push([]);
-        this._map.forEach(row=>{for(let k = 0; k < this._w; k++) row.push(0);})
+        this._map.forEach(row=>{for(let k = 0; k < this._w; k++) row.push({type: null, filled: 0});})
     }
 
     get map() {
@@ -42,21 +48,26 @@ export class Map extends MapRenderer implements MapInterface {
     }
 
     detectFullLine() {
-        const fullLines = this._map.filter(line=>line.reduce((a,b)=>a+b)===10)
+        const fullLines = this._map.filter(line=>line.reduce((a,b)=> a + b.filled,0)===10)
         return fullLines;
     }
 
-    fixBlock(x: number, y: number) {
-        this._map[y][x] = 1;
+    fixBlock(x: number, y: number, type: BlockBundleType) {
+        this._map[y][x].filled = 1;
+        this._map[y][x].type = type
+        this.modifyGridByClass(`block-grid_${y*10 + x}`, `${type}-fill`, 'add')
         this.modifyGridByClass(`block-grid_${y*10 + x}`, 'fill-fixed-block', 'add')
     }
 
     eraseBlock(x:number, y:number) {
-        this._map[y][x] = 0;
+        const prevInfo = this._map[y][x]
+        this.modifyGridByClass(`block-grid_${y*10 + x}`, `${prevInfo.type}-fill`,'remove')
         this.modifyGridByClass(`block-grid_${y*10 + x}`, 'fill-fixed-block','remove')
+        prevInfo.filled = 0;
+        prevInfo.type = null
     }
 
-    async fullLineBlink(fullLines: number[][], blinkTime: number): Promise<boolean> {
+    async fullLineBlink(fullLines: MapGridInfo[][], blinkTime: number): Promise<boolean> {
 
         let walk = fullLines.length - 1
 
@@ -67,6 +78,7 @@ export class Map extends MapRenderer implements MapInterface {
             }
             if(walk < 0) break;
         }
+
 
         return new Promise((resolve)=>{
             setTimeout(()=>resolve(true), blinkTime)
@@ -85,7 +97,7 @@ export class Map extends MapRenderer implements MapInterface {
         })
     }
 
-    destroyFullLine(fullLines: number[][]) {
+    destroyFullLine(fullLines: MapGridInfo[][]) {
     
         if(fullLines.length === 0) return ;
 
@@ -93,13 +105,13 @@ export class Map extends MapRenderer implements MapInterface {
 
         for(let k = this._h - 1; k >= 0; k--) {
             if(this._map[k] === fullLines[walk]) {
-                this._map[k].forEach((_: number, i: number)=>this.eraseBlock(i, k));
+                this._map[k].forEach((_: MapGridInfo, i: number)=>this.eraseBlock(i, k));
                 walk--
             }
             else {
-                this._map[k].forEach((v: number, i: number)=>{
-                    if(walk < fullLines.length - 1 && v===1) {
-                        this.fixBlock(i, k+fullLines.length-1-walk);
+                this._map[k].forEach((v: MapGridInfo, i: number)=>{
+                    if(walk < fullLines.length - 1 && v.filled===1 && v.type) {
+                        this.fixBlock(i, k+fullLines.length-1-walk, v.type);
                         this.eraseBlock(i, k)
                     }
                 })
