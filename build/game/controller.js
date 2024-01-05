@@ -45,32 +45,36 @@ export class Controller {
         }
         return valid;
     }
-    renderPreviewNext() {
-        this._blockBundle.nextBlockBundleSetting.coord.forEach((coord) => {
+    renderPreviewNext(setting) {
+        setting.coord.forEach((coord) => {
             var _a;
-            (_a = document.getElementById(`preview-grid_${coord.y * 4 + coord.x}`)) === null || _a === void 0 ? void 0 : _a.classList.add('preview-fill');
+            (_a = document.getElementById(`preview-grid_${coord.y * 4 + coord.x}`)) === null || _a === void 0 ? void 0 : _a.classList.add(`${setting.type}-fill`);
         });
     }
-    erasePreviewNext() {
-        this._blockBundle.blockBundleSetting.coord.forEach(coord => {
+    erasePreviewNext(setting) {
+        setting.coord.forEach(coord => {
             var _a;
-            (_a = document.getElementById(`preview-grid_${coord.y * 4 + coord.x}`)) === null || _a === void 0 ? void 0 : _a.classList.remove('preview-fill');
+            (_a = document.getElementById(`preview-grid_${coord.y * 4 + coord.x}`)) === null || _a === void 0 ? void 0 : _a.classList.remove(`${setting.type}-fill`);
         });
     }
-    updateMovingBlockRenderAction(action, idPrefix, c, prev = false) {
-        this.eraseTrackOfMovingBlock(idPrefix, c);
-        action();
-        this.renderMovingBlock(idPrefix, c, prev);
+    updateMovingBlockRenderAction(action, idPrefix, c, preview = false, firstRender = false) {
+        //before update(refresh)
+        if (!firstRender) {
+            if (preview)
+                this.erasePreviewNext(this._blockBundle.nextBlockBundleSetting);
+            this.eraseTrackOfMovingBlock(idPrefix, c);
+        }
+        action(); //refresh
+        //after update(refresh)
+        if (preview)
+            this.renderPreviewNext(this._blockBundle.nextBlockBundleSetting);
+        this.renderMovingBlock(idPrefix, c);
     }
     renderMap(root) {
         this._map.renderMap(root);
     }
-    renderMovingBlock(idPrefix, c, prev = false) {
+    renderMovingBlock(idPrefix, c) {
         this._blockBundle.render(idPrefix, c, MAP_WIDTH);
-        if (prev) {
-            this.erasePreviewNext();
-            this.renderPreviewNext();
-        }
     }
     eraseTrackOfMovingBlock(idPrefix, c) {
         this._blockBundle.erase(idPrefix, c, MAP_WIDTH);

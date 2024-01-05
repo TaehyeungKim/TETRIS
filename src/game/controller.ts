@@ -1,7 +1,7 @@
 import {  BlockBundleInterface, BlockBundleConstructor } from "../block/blockBundle.js";
 import { BlockElement, BlockMoveDirection } from "../block/blockElement.js";
 import {  MapInterface, MapConstructor } from "../map/map.js";
-import { INITIAL_BLOCK_SETTTING, MAP_WIDTH } from "../constant.js";
+import { INITIAL_BLOCK_SETTTING, MAP_WIDTH, BlockBundleType, BlockBundleSetting } from "../constant.js";
 import { Player, PlayerInterface } from "./player.js";
 
 export class Controller {
@@ -48,34 +48,40 @@ export class Controller {
         return valid;
     }
 
-    private renderPreviewNext() {
-        this._blockBundle.nextBlockBundleSetting.coord.forEach((coord)=>{
-            document.getElementById(`preview-grid_${coord.y*4+coord.x}`)?.classList.add('preview-fill')
+    private renderPreviewNext(setting: BlockBundleSetting) {
+        setting.coord.forEach((coord)=>{
+            document.getElementById(`preview-grid_${coord.y*4+coord.x}`)?.classList.add(`${setting.type}-fill`)
         })
     }
 
-    private erasePreviewNext() {
-        this._blockBundle.blockBundleSetting.coord.forEach(coord=>{
-            document.getElementById(`preview-grid_${coord.y*4+coord.x}`)?.classList.remove('preview-fill')
+    private erasePreviewNext(setting: BlockBundleSetting) {
+        setting.coord.forEach(coord=>{
+            document.getElementById(`preview-grid_${coord.y*4+coord.x}`)?.classList.remove(`${setting.type}-fill`)
         })
     }
 
-    updateMovingBlockRenderAction(action:()=>unknown, idPrefix: string, c: string, prev:boolean=false) {
-        this.eraseTrackOfMovingBlock(idPrefix, c)
-        action()
-        this.renderMovingBlock(idPrefix, c, prev)
+    updateMovingBlockRenderAction(action:()=>unknown, idPrefix: string, c: string, preview:boolean=false, firstRender:boolean=false) {
+        
+        //before update(refresh)
+        
+        if(!firstRender) {
+            if(preview) this.erasePreviewNext(this._blockBundle.nextBlockBundleSetting)
+            this.eraseTrackOfMovingBlock(idPrefix, c)
+        }
+        
+        action()   //refresh
+
+        //after update(refresh)
+        if(preview) this.renderPreviewNext(this._blockBundle.nextBlockBundleSetting)
+        this.renderMovingBlock(idPrefix, c)
     } 
 
     renderMap(root: HTMLElement) {
         this._map.renderMap(root);
     }
-
-    renderMovingBlock(idPrefix: string, c: string, prev:boolean=false) {
+ 
+    renderMovingBlock(idPrefix: string, c: string) {
         this._blockBundle.render(idPrefix, c, MAP_WIDTH);
-        if(prev) {
-            this.erasePreviewNext();
-            this.renderPreviewNext();
-        }
     }
 
     private eraseTrackOfMovingBlock(idPrefix: string, c: string) {

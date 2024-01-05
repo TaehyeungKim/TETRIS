@@ -54,7 +54,7 @@ export class Game extends Controller implements GameInterface{
         }
 
         this.renderMap(document.getElementById('game-grid') as HTMLElement)
-        this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass, true)
+        this.updateMovingBlockRenderAction(()=>{}, Game.movingBlockGridPrefix, Game.movingBlockFillClass, true, true)
         this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         window.addEventListener('keydown', moveByKey)
 

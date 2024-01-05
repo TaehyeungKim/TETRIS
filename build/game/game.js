@@ -36,7 +36,7 @@ export class Game extends Controller {
             }
         };
         this.renderMap(document.getElementById('game-grid'));
-        this.renderMovingBlock(Game.movingBlockGridPrefix, Game.movingBlockFillClass, true);
+        this.updateMovingBlockRenderAction(() => { }, Game.movingBlockGridPrefix, Game.movingBlockFillClass, true, true);
         this.registerAutoBlockMove(Game.movingBlockGridPrefix, Game.movingBlockFillClass);
         window.addEventListener('keydown', moveByKey);
         this._player.startTimer(document.getElementById('time'));
