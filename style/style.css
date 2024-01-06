@@ -1,8 +1,7 @@
 :root {
-    --grid-area-total-width: 200px;
+    --grid-area-total-width: 70%;
     --grid-area-background-color: white;
 
-    --preview-grid-width: calc(var(--grid-area-total-width)/12.4);
     --toy-background-color:#BEFBFF;
     --toy-border-color: #E5F0FF;
 
@@ -10,15 +9,21 @@
 
     --controller-button-color: rgb(0, 200, 255);
 
-    --grid-background-color: 
-
     
+    --controller-variation-max-height: 700px;    
 }
 
 
 body {
     margin: 0;
     padding: 0;
+}
+
+.frame {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
 }
 
 .game-container {
@@ -35,6 +40,10 @@ body {
 
 /* ========================================================================================== */
 /* next block preview */
+
+.right {
+    flex-grow: 1;
+}
 
 .preview-next-container {
     padding: 0.5em;
@@ -54,8 +63,7 @@ body {
     display: grid;
     grid-template-rows: repeat(4, 1fr);
     grid-template-columns: repeat(4, 1fr);
-    width: calc(var(--preview-grid-width)*4);
-    height: calc(var(--preview-grid-width)*4);
+    width: 100%;
     aspect-ratio: 1;
 }
 
@@ -129,7 +137,8 @@ body {
 
 .toy {
     position: relative;
-    width: fit-content;
+    width: 100vw;
+    max-width: 300px;
     margin: 0 auto 0;
     padding: 0.75em;
     z-index: -10;
@@ -214,22 +223,38 @@ body {
 
 
 
+
+
+
+
+
 /* controller */
 
 .controller-section {
     padding: 1em;
 }
 
-.controller {
+.controller{
     display: grid;
-    grid-template-rows: repeat(3,1fr);
+    grid-template-rows: repeat(3,minmax(20px, 1fr));
     grid-template-columns: repeat(3,1fr);
-    width: 60%;
-    aspect-ratio:1;
+    width: 80%;
+    /* aspect-ratio:1; */
     grid-template-areas: "b1 upper-button b2"
     "left-button center-button right-button"
     "b3 down-button b4";
     margin: 0 auto 0;
+    gap: 1em 1em;
+}
+
+@media screen and (max-height: 700px) {
+    .controller {
+        
+        gap: 0;
+        aspect-ratio: 1.78;
+        margin: 0;
+        width: 100%;
+    }
 }
 
 .left-controller {
@@ -248,6 +273,10 @@ body {
     grid-area: down-button
 }
 
+.center-controller {
+    grid-area: center-button;
+}
+
 
 
 [class*='-controller'] {
@@ -259,11 +288,55 @@ body {
 [class*='-controller']::after {
     content: "";
     background-color: var(--controller-button-color);
-    width: 75%;
+    width: 95%;
     aspect-ratio: 1;
 
     border-radius: 50%;
     box-shadow:0px 0px 10px 4px rgba(0,0,0,0.75);
+}
+
+[class*='-controller']:is([class='center-controller'])::after {
+    display: none;
+}
+
+@media screen and (max-height: 700px) {
+
+    [class*='-controller']::after {
+        height: 100%;
+        width: calc(100%/1.78);
+        /* box-shadow: none; */
+    }
+
+    /* .left-controller::after {
+        box-shadow: -2px 0px 4px 0px rgba(0,0,0,0.5), 
+        0px -2px 4px 1px rgba(0,0,0,0.5),
+        0px 2px 4px 1px rgba(0,0,0,0.5);
+    }
+
+    .right-controller::after {
+        box-shadow: 2px 0px 4px 0px rgba(0,0,0,0.5), 
+        0px -2px 4px 1px rgba(0,0,0,0.5),
+        0px 2px 4px 1px rgba(0,0,0,0.5);
+    }
+
+    .top-controller::after {
+        box-shadow: 2px 0px 4px 0px rgba(0,0,0,0.5), 
+        -2px 0px 4px 1px rgba(0,0,0,0.5),
+        0px -2px 4px 1px rgba(0,0,0,0.5);
+    }
+
+    .down-controller::after {
+        box-shadow: 2px 0px 4px 0px rgba(0,0,0,0.5), 
+        -2px 0px 4px 1px rgba(0,0,0,0.5),
+        0px 2px 4px 1px rgba(0,0,0,0.5);
+    }
+
+    
+    
+    [class*='-controller']:is([class='center-controller'])::after {
+        display: block;
+        box-shadow: none;
+    } */
 }
 
 
