@@ -40,7 +40,7 @@ export class MapRenderer extends Renderer implements MapRendererInterface{
     `
 
     private static mapOverlapGridTemplate: string = MapRenderer.mapGridTemplate + `
-    z-index: -1;
+    z-index: 10;
     `
 
     
